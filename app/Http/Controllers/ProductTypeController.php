@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ProductService;
+use App\Services\ProductTypeService;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class ProductTypeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $data['title'] = 'Barang';
-        $data['resource'] = 'products';
-        $productService = new ProductService;
+        $data['title'] = 'Jenis Barang';
+        $data['resource'] = 'product-types';
+        $productService = new ProductTypeService;
         $orderBy = $request->has('order_by') ? [$request->order_by => $request->order_type] : ['created_at' => 'desc'];
 
         $filters = [];
@@ -30,11 +30,10 @@ class ProductController extends Controller
             }
         }
 
-        $data['data'] = $productService->indexProduct($filters, $orderBy);
+        $data['data'] = $productService->indexProductType($filters, $orderBy);
 
         $data['columns'] = [
-            ['col' => 'productType.name', 'label' => 'Jenis Barang', 'filter' => true],
-            ['col' => 'name', 'label' => 'Nama Barang', 'filter' => true]
+            ['col' => 'name', 'label' => 'Nama Jenis Barang', 'filter' => true]
         ];
 
         $data['can_create'] = true;
@@ -49,20 +48,17 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(ProductService $productService)
+    public function create()
     {
         $data['title'] = 'Tambah Barang';
 
         $data['resource'] = 'products';
 
-        $options = $productService->listProductType();
-
         $data['columns'] = [
-            ['col' => 'product_type_id', 'label' => 'Jenis Barang', 'type' => 'select', 'options' => ['' => '--- Pilih Jenis Barang ---'] + $options->toArray(), 'value' => 'name', 'key' => 'id', 'required' => true],
-            ['col' => 'name', 'label' => 'Nama Barang', 'type' => 'text', 'placeholder' => 'Masukkan Nama Barang', 'required' => true],
+            ['col' => 'name', 'label' => 'Nama Jenis Barang', 'type' => 'text', 'placeholder' => 'Masukkan Nama Jenis Barang', 'required' => true],
         ];
 
-        $data['action'] = route('products.store');
+        $data['action'] = route('product-types.store');
         $data['method'] = 'POST';
         $data['edit'] = true;
         return view('templates.form', $data);
@@ -71,33 +67,31 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, ProductService $productService)
+    public function store(Request $request, ProductTypeService $productTypeService)
     {
         $data = $request->all();
         try {
-            $productService->saveProduct($data);
+            $productTypeService->saveProductType($data);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. ' . $e->getMessage());
         }
 
-        return redirect()->route('products.index')->with('success', 'Berhasil menyimpan data.');
+        return redirect()->route('product-types.index')->with('success', 'Berhasil menyimpan data.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id, ProductService $productService)
+    public function show($id, ProductTypeService $productTypeService)
     {
-        $data['title'] = 'Detail Barang';
-        $data['resource'] = 'products';
+        $data['title'] = 'Detail Jenis Barang';
+        $data['resource'] = 'product-types';
 
         try {
-            $product = $productService->showProduct($id);
-            $options = $productService->listProductType();
+            $productType = $productTypeService->showProductType($id);
 
             $data['columns'] = [
-                ['col' => 'product_type_id', 'label' => 'Jenis Barang', 'type' => 'select', 'value' => $product->product_type_id, 'options' => ['' => '--- Pilih Jenis Barang ---'] + $options->toArray(), 'required' => true],
-                ['col' => 'name', 'label' => 'Nama Barang', 'type' => 'text', 'value' => $product->name, 'placeholder' => 'Masukkan Nama Barang', 'required' => true],
+                ['col' => 'name', 'label' => 'Nama Jenis Barang', 'type' => 'text', 'value' => $productType->name, 'placeholder' => 'Masukkan Nama Barang', 'required' => true],
             ];
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menampilkan data. ' . $e->getMessage());
@@ -112,24 +106,22 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id, ProductService $productService)
+    public function edit($id, ProductTypeService $productTypeService)
     {
-        $data['title'] = 'Perbarui Barang';
-        $data['resource'] = 'products';
+        $data['title'] = 'Perbarui Jenis Barang';
+        $data['resource'] = 'product-types';
 
         try {
-            $product = $productService->showProduct($id);
-            $options = $productService->listProductType();
+            $productType = $productTypeService->showProductType($id);
 
             $data['columns'] = [
-                ['col' => 'product_type_id', 'label' => 'Jenis Barang', 'type' => 'select', 'value' => $product->product_type_id, 'options' => ['' => '--- Pilih Jenis Barang ---'] + $options->toArray(), 'required' => true],
-                ['col' => 'name', 'label' => 'Nama Barang', 'type' => 'text', 'value' => $product->name, 'placeholder' => 'Masukkan Nama Barang', 'required' => true],
+                ['col' => 'name', 'label' => 'Nama Jenis Barang', 'type' => 'text', 'value' => $productType->name, 'placeholder' => 'Masukkan Nama Barang', 'required' => true],
             ];
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menampilkan data. ' . $e->getMessage());
         }
 
-        $data['action'] = route('products.update', $id);
+        $data['action'] = route('product-types.update', $id);
         $data['method'] = 'PUT';
         $data['edit'] = true;
 
@@ -139,30 +131,30 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id, ProductService $productService)
+    public function update(Request $request, $id, ProductTypeService $productTypeService)
     {
         $data = $request->all();
 
         try {
-            $productService->saveProduct($data, $id);
+            $productTypeService->saveProductType($data, $id);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal memperbarui data. ' . $e->getMessage());
         }
 
-        return redirect()->route('products.index')->with('success', 'Berhasil memperbarui data.');
+        return redirect()->route('product-types.index')->with('success', 'Berhasil memperbarui data.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id, ProductService $productService)
+    public function destroy($id, ProductTypeService $productTypeService)
     {
         try {
-            $productService->destroyProduct($id);
+            $productTypeService->destroyProductType($id);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus data. ' . $e->getMessage());
         }
 
-        return redirect()->route('products.index')->with('success', 'Berhasil Menghapus data.');
+        return redirect()->route('product-types.index')->with('success', 'Berhasil Menghapus data.');
     }
 }

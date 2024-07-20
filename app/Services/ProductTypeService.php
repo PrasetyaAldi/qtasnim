@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Product;
 use App\Models\ProductType;
 
-class ProductService
+class ProductTypeService
 {
-    protected $model = Product::class;
+    protected $model = ProductType::class;
 
-    public function indexProduct(array $filters = [], array $orderBy = ['created_at' => 'desc'], int $limit = 10)
+    public function indexProductType(array $filters = [], array $orderBy = ['created_at' => 'desc'], int $limit = 10)
     {
         $query = $this->model::query();
 
@@ -38,7 +37,7 @@ class ProductService
                     foreach ($columns as $column) {
                         $query->orWhere($column, 'ilike', "%" . $filters[0] . "%");
                     }
-                    $query->orWhereHas('productType', function ($query) use ($filters) {
+                    $query->orWhereHas('product', function ($query) use ($filters) {
                         $query->where('name', 'ilike', "%" . $filters[0] . "%");
                     });
                 });
@@ -64,43 +63,33 @@ class ProductService
         return $data;
     }
 
-    public function saveProduct(array $data, int $id = null)
+    public function saveProductType(array $data, int $id = null)
     {
-        $product = new $this->model;
+        $productType = new $this->model;
 
         // hanya jika ada id
         if (!is_null($id)) {
-            $product = $this->showProduct($id);
+            $productType = $this->showProductType($id);
         }
 
-        $product->fill($data);
+        $productType->fill($data);
 
-        $product->save();
+        $productType->save();
 
-        return $product;
+        return $productType;
     }
 
-    public function showProduct(int $id)
+    public function showProductType(int $id)
     {
         return $this->model::findOrFail($id);
     }
 
-    public function destroyProduct(int $id)
+    public function destroyProductType(int $id)
     {
-        $product = $this->showProduct($id);
+        $productType = $this->showProductType($id);
 
-        $product->delete();
+        $productType->delete();
 
-        return $product;
-    }
-
-    public function listProduct()
-    {
-        return $this->model::all()->pluck('name', 'id');
-    }
-
-    public function listProductType()
-    {
-        return ProductType::all()->pluck('name', 'id');
+        return $productType;
     }
 }

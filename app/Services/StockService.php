@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Product;
-use App\Models\ProductType;
+use App\Models\Stock;
 
-class ProductService
+class StockService
 {
-    protected $model = Product::class;
+    protected $model = Stock::class;
 
-    public function indexProduct(array $filters = [], array $orderBy = ['created_at' => 'desc'], int $limit = 10)
+    public function indexStock(array $filters = [], array $orderBy = ['created_at' => 'desc'], int $limit = 10)
     {
         $query = $this->model::query();
 
@@ -38,7 +37,7 @@ class ProductService
                     foreach ($columns as $column) {
                         $query->orWhere($column, 'ilike', "%" . $filters[0] . "%");
                     }
-                    $query->orWhereHas('productType', function ($query) use ($filters) {
+                    $query->orWhereHas('product', function ($query) use ($filters) {
                         $query->where('name', 'ilike', "%" . $filters[0] . "%");
                     });
                 });
@@ -64,43 +63,33 @@ class ProductService
         return $data;
     }
 
-    public function saveProduct(array $data, int $id = null)
+    public function saveStock(array $data, int $id = null)
     {
-        $product = new $this->model;
+        $stock = new $this->model;
 
         // hanya jika ada id
         if (!is_null($id)) {
-            $product = $this->showProduct($id);
+            $stock = $this->showStock($id);
         }
 
-        $product->fill($data);
+        $stock->fill($data);
 
-        $product->save();
+        $stock->save();
 
-        return $product;
+        return $stock;
     }
 
-    public function showProduct(int $id)
+    public function showStock(int $id)
     {
         return $this->model::findOrFail($id);
     }
 
-    public function destroyProduct(int $id)
+    public function destroyStock(int $id)
     {
-        $product = $this->showProduct($id);
+        $stock = $this->showStock($id);
 
-        $product->delete();
+        $stock->delete();
 
-        return $product;
-    }
-
-    public function listProduct()
-    {
-        return $this->model::all()->pluck('name', 'id');
-    }
-
-    public function listProductType()
-    {
-        return ProductType::all()->pluck('name', 'id');
+        return $stock;
     }
 }
