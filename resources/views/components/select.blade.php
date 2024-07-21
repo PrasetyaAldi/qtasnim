@@ -24,6 +24,9 @@
                 </option>
             @endforeach
         </select>
+        @if ($errors->has($name))
+            <span class="text-danger">{{ $errors->first($name) }}</span>
+        @endif
     @else
         <p>{{ $options[$value] }}</p>
     @endif

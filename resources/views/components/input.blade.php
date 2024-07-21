@@ -19,6 +19,9 @@
             value="{{ $value }}" placeholder="{{ $placeholder }}"
             @if ($required) required @endif @if ($disabled) disabled @endif
             @if ($readonly) readonly @endif>
+        @if ($errors->has($name))
+            <span class="text-danger">{{ $errors->first($name) }}</span>
+        @endif
     @else
         @php
             $value = $value;

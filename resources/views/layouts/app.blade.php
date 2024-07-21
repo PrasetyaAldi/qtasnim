@@ -55,7 +55,7 @@
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
     </script>
     <script src="{{ asset('js/app.js') }}"></script>
-    <script src="https://kit.fontawesome.com/e427dc0a75.js" crossorigin="anonymous"></script>
+    <script src="{{ asset('js/fontawesome.js') }}" crossorigin="anonymous"></script>
     @yield('scripts')
 </body>
 

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Product;
 use App\Models\Stock;
 use App\Models\Transaction;
 use Carbon\Carbon;
@@ -45,13 +44,11 @@ class TransactionService
                 $columns = (new $this->model)->getFillable();
                 $query->where(function ($query) use ($columns, $filters) {
                     foreach ($columns as $column) {
-                        // hanya jika column mengandung kata '_date'
                         if (strpos($column, '_date')) {
-                            $filterDate = Carbon::parse($filters[0]);
-                            $query->orWhereDate($column, $filterDate);
-                        } else {
-                            $query->orWhere($column, 'ilike', "%" . $filters[0] . "%");
+                            continue;
                         }
+
+                        $query->orWhere($column, 'ilike', "%" . $filters[0] . "%");
                     }
                     $query->orWhereHas('product', function ($query) use ($filters) {
                         $query->where('name', 'ilike', "%" . $filters[0] . "%");
@@ -174,6 +171,11 @@ class TransactionService
     {
         $filters['start_date'] = $filters['start_date'] ?? Carbon::now()->subMonth()->format('Y-m-d'); // defaultnya adalah satu bulan sebelum sekarang
         $filters['end_date'] = $filters['end_date'] ?? Carbon::now()->format('Y-m-d'); // defaultnya adalah sekarang
+
+        // hanya jika start_date > end_date
+        if ($filters['start_date'] > $filters['end_date']) {
+            throw new \Exception('Tanggal awal tidak boleh lebih besar dari tanggal akhir.');
+        }
 
         // get product type and sum quantity of transaction
         $query = $this->model::query();

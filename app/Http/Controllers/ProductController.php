@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
@@ -74,6 +75,16 @@ class ProductController extends Controller
     public function store(Request $request, ProductService $productService)
     {
         $data = $request->all();
+        $validator = Validator::make($request->all(), [
+            'product_type_id' => 'required|exists:product_types,id',
+            'name' => 'required|max:100'
+        ]);
+
+        // hanya jika ada error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         try {
             $productService->saveProduct($data);
         } catch (\Exception $e) {
@@ -142,6 +153,15 @@ class ProductController extends Controller
     public function update(Request $request, $id, ProductService $productService)
     {
         $data = $request->all();
+        $validator = Validator::make($request->all(), [
+            'product_type_id' => 'required|exists:product_types,id',
+            'name' => 'required|max:100'
+        ]);
+
+        // hanya jika ada error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         try {
             $productService->saveProduct($data, $id);

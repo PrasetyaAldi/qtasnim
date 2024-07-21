@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ProductService;
 use App\Services\StockService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class StockController extends Controller
 {
@@ -78,6 +79,16 @@ class StockController extends Controller
     {
         $data = $request->all();
 
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric'
+        ]);
+
+        // hanya jika ada error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         try {
             $stockService->saveStock($data);
         } catch (\Exception $e) {
@@ -148,6 +159,16 @@ class StockController extends Controller
     public function update(Request $request, $id, StockService $stockService)
     {
         $data = $request->all();
+
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric'
+        ]);
+
+        // hanya jika ada error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         try {
             $stockService->saveStock($data, $id);

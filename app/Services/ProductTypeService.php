@@ -37,9 +37,6 @@ class ProductTypeService
                     foreach ($columns as $column) {
                         $query->orWhere($column, 'ilike', "%" . $filters[0] . "%");
                     }
-                    $query->orWhereHas('product', function ($query) use ($filters) {
-                        $query->where('name', 'ilike', "%" . $filters[0] . "%");
-                    });
                 });
             }
         }

@@ -7,6 +7,7 @@ use App\Services\ProductService;
 use App\Services\TransactionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
@@ -83,6 +84,18 @@ class TransactionController extends Controller
     public function store(Request $request, TransactionService $transactionService)
     {
         $data = $request->all();
+
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric',
+            'transaction_date' => 'required|date'
+        ]);
+
+        // hanya jika ada error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         try {
             $transactionService->saveTransaction($data);
         } catch (\Exception $e) {
@@ -156,6 +169,17 @@ class TransactionController extends Controller
     {
         $data = $request->all();
 
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric',
+            'transaction_date' => 'required|date'
+        ]);
+
+        // hanya jika ada error
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         try {
             $transactionService->updateTransaction($data, $id);
         } catch (\Exception $e) {
@@ -184,8 +208,6 @@ class TransactionController extends Controller
      */
     public function compare(Request $request, TransactionService $transactionService)
     {
-        $dataCompare = $request->all();
-
         $data['title'] = 'Perbandingan Penjualan';
         $data['resource'] = 'transactions';
         $data['can_create'] = false;
