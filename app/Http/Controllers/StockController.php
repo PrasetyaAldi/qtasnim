@@ -80,7 +80,7 @@ class StockController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($request->all(), [
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:products,id|unique:stocks,product_id',
             'quantity' => 'required|numeric'
         ]);
 
@@ -161,7 +161,7 @@ class StockController extends Controller
         $data = $request->all();
 
         $validator = Validator::make($request->all(), [
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:products,id|unique:stocks,product_id,' . $id . ',id',
             'quantity' => 'required|numeric'
         ]);
 
