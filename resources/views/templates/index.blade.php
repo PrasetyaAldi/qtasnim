@@ -97,7 +97,7 @@
                     @endif
                 </thead>
                 <tbody>
-                    @foreach ($data as $item)
+                    @forelse ($data as $item)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             @foreach ($columns as $column)
@@ -114,7 +114,7 @@
                                 @endphp
                                 <td>{{ $value }}</td>
                             @endforeach
-                            @if (!isset($is_compare))
+                            @if (!isset($is_compare) || !empty($buttonLinear))
                                 <td>
                                     <div class="d-flex">
                                         <a href="{{ route($resource . '.edit', $item->id) }}"
@@ -131,7 +131,12 @@
                                 </td>
                             @endif
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="{{ count($columns) + (!empty($buttonLinear) ? 2 : 1) }}" class="text-center">Data
+                                Kosong</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
             {{ !empty($data) ? $data->links() : '' }}
